@@ -1,0 +1,7 @@
+%!TEX root = 2024-cmsb_tool.tex
+
+In life sciences, deriving insights from dynamic models can be challenging due to the large number of state variables involved. To address this, model reduction techniques can be used to project the system onto a lower-dimensional state space.
+Constrained lumping can reduce systems of ordinary differential equations with polynomial derivatives up to linear combinations of the original variables while preserving specific output variables of interest.
+Exact reductions may be too restrictive in practice for biological systems since quantitative information is often uncertain or subject to estimations and measurement errors. This might come at the cost of limiting the actual aggregation power of exact reduction techniques.
+We propose an extension of exact constrained lumping which relaxes the exactness requirements up to a given tolerance parameter $\varepsilon$. We prove that the accuracy, i.e., the difference between the output variables in the original and reduced model, is in the order of $\varepsilon$. Furthermore, we provide a heuristic algorithm to find the smallest $\varepsilon$ for a given maximal approximation error.
+Finally, we demonstrate the approach in biological models from the literature by providing coarser aggregations than exact lumping while accurately capturing the original system dynamics.

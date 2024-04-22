@@ -1,0 +1,256 @@
+\documentclass[a4paper,american]{llncs}
+
+\usepackage{microtype}%if unwanted, comment out or use option "draft"
+\usepackage{amssymb,amsmath}
+\usepackage{algorithm,algorithmic}
+\usepackage[shortlabels]{enumitem}
+%\usepackage{dsfont}
+%\usepackage[american]{babel}
+\usepackage{pgf}
+%\usepackage{tikz}
+%\usepackage{wrapfig}
+%\usepackage{extarrows}
+%\usepackage{array}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{adjustbox}
+\usepackage{longtable}
+%\usepackage{matlab-prettifier}
+%\usepackage{caption}
+% \captionsetup{compatibility=false}
+\usepackage{subcaption}
+%\usetikzlibrary{arrows,shapes,decorations}
+\usepackage{wrapfig}
+\usepackage{hyperref}
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\newif\ifshowcomments
+\showcommentstrue % uncomment to show the comments
+
+
+\definecolor{orange}{RGB}{255,127,0}
+\newcommand{\coma}[1]{\ifshowcomments{\color{orange}[AV: #1]}\fi}
+\newcommand{\comm}[1]{\ifshowcomments{\color{red}[MT: #1]}\fi}
+\newcommand{\comax}[1]{\ifshowcomments{\color{purple} Max: #1}\fi}
+\newcommand{\comant}[1]{\ifshowcomments{\color{cyan} {\em [Antonio: #1]}}\fi}
+\newcommand{\comalex}[1]{{\color{olive} #1}}
+\newcommand*{\myalign}[2]{\multicolumn{1}{#1}{#2}}
+%\renewcommand{\coma}[1]{}\cite{DBLP:journals/pnas/CardelliTTV17}
+%\renewcommand{\com}[1]{}
+%\renewcommand{\comax}[1]{}
+\setlength{\tabcolsep}{8pt}
+\newcommand{\webpage}{{\color{blue}https://sysma.imtlucca.it/tools/erode/UCTMC/}-\coma{I HAVE TO UPDATE THE ZENODO PAGE}}
+
+\usepackage{array}
+\newcolumntype{H}{>{\setbox0=\hbox\bgroup}c<{\egroup}@{}}
+
+\synctex=1
+
+\newcommand{\qedInProof}{
+	{\qed}
+	%
+	%    \IfEqCase{\concurORQuanticolTR}{%
+	%        {concur}{{\qed}}%
+	%        % you can add more cases here as desired
+	%    }%[\PackageError{tree}{Undefined option to tree: #1}{}]%You can decide to launch an exception if cases do not match
+}%
+
+\DeclareMathOperator{\sgn}{sgn}
+
+\newcommand{\act}[1]{\xlongrightarrow{#1}}          % transition of with action type [1]
+
+\newcommand{\norm}[1]{\lVert #1 \rVert_2}
+\newcommand{\norme}[1]{\lVert #1 \rVert_2}
+\newcommand{\normo}[1]{\lVert #1 \rVert_1}
+\newcommand{\dt}[1]{\dot{#1}}
+\newcommand{\tha}{\hat{t}}
+\newcommand{\hh}{\hat{H}}
+\newcommand{\hx}{\hat{x}}
+\newcommand{\hr}{\hat{r}}
+\newcommand{\tr}{\tilde{r}}
+\newcommand{\RE}{\mathbb{R}}
+\newcommand{\REz}{\mathbb{R}_{\geq0}}
+\newcommand{\dom}{\mathcal{D}}
+\newcommand{\im}{\mathcal{R}}
+
+\newcommand{\uA}{{u_{\calK}}}
+\newcommand{\uS}{{u_S}}
+\newcommand{\uAS}{{\uA,\uS}}
+
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calE}{\mathcal{E}}
+\newcommand{\calF}{\mathcal{F}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calG}{\mathcal{G}}
+\newcommand{\calI}{\mathcal{I}}
+\newcommand{\calJ}{\mathcal{J}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calK}{\mathcal{K}}
+\newcommand{\calR}{\mathcal{R}}
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calW}{\mathcal{W}}
+
+\newcommand{\tF}{\tilde{F}}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\rsp}{rowsp}
+\DeclareMathOperator{\dev}{dev}
+
+
+\newcommand{\upa}{\underline{p}}
+\newcommand{\upi}{\underline{\pi}}
+\newcommand{\upia}{\underline{\pi}^\ast}
+\newcommand{\uphi}{\underline{\phi}}
+\newcommand{\pia}{\pi^\ast}
+
+\newcommand{\deps}{\Delta \varepsilon}
+
+\newcommand{\fru}{\mathfrak{u}}
+\newcommand{\frut}{\mathfrak{\tilde{u}}}
+
+
+\newcommand{\eps}{\varepsilon}
+\newcommand{\epst}{\varepsilon'}
+\newcommand{\epsp}{\varepsilon^+}
+\newcommand{\epso}{\varepsilon^{\mathit{old}}}
+\newcommand{\epsn}{\varepsilon^{\mathit{new}}}
+\newcommand{\hk}{\hat{\kappa}}
+\newcommand{\frb}{\mathfrak{b}}
+
+%\newcommand{\dt}{\Delta t}
+%\newcommand{\dtau}{\Delta \tau}
+%\newcommand{\dte}{\Delta t_{\mathit{err}}}
+%\newcommand{\dth}{\Delta \theta}
+
+
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+%\let\example\undefined
+%\newtheorem{example}{Example}
+%\newtheorem{myExample}[example]{Example}
+
+\newenvironment{myExample}{\begin{example}}{\hfill $\blacksquare$ \end{example}}
+\newif\ifshowproofs
+\showproofsfalse
+
+\begin{document}
+
+
+
+\title{CLUE 2.0 - Lumping of Ordinary Differential Equations}
+
+\institute{
+	%University of Oxford, UK
+	%\and
+	%TU Wien, Austria
+	%\and
+	Aalborg University, Denmark
+	\and
+	IMT School for Advanced Studies Lucca, Italy
+	\and
+	Sant'Anna School of Advanced Studies, Pisa, Italy
+	\and
+	DTU Technical University of Denmark
+}
+
+\author{
+Alexander Leguizamon-Robayo \inst{1} \and
+Antonio Jim\'{e}nez-Pastor \inst{1} \and
+Micro Tribastone\inst{2}
+Max Tschaikowski \inst{1} \and
+Andrea Vandin\inst{3,4}
+}
+
+
+%\author{Luca Cardelli\inst{1} \and Radu Grosu\inst{2} \and Kim G. Larsen\inst{3} \\ Mirco Tribastone\inst{4} \and Max Tschaikowski\inst{3} \and Andrea Vandin\inst{5,6}}
+
+
+%
+%
+%\Copyright{L. Cardelli, K. G. Larsen, R. Grosu, M. Tribastone, M. Tschaikowski, and A. Vandin} %mandatory, please use full first names. LIPIcs license is "CC-BY";  http://creativecommons.org/licenses/by/3.0/
+%
+%\subjclass{D.2.4, G.1.7, J.2}%  Dummy classification -- please refer to \url{http://www.acm.org/about/class/ccs98-html}}% mandatory: Please choose ACM 1998 classifications from http://www.acm.org/about/class/ccs98-html . E.g., cite as "F.1.1 Models of Computation".
+%\keywords{Uncertain Markov chains -- Lumpability -- Model Checking}% mandatory: Please provide 1-5 keywords
+%% Author macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%%Editor-only macros:: begin (do not touch as author)%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\serieslogo{}%please provide filename (without suffix)
+%\volumeinfo%(easychair interface)
+%{Billy Editor and Bill Editors}% editors
+%{2}% number of editors: 1, 2, ....
+%{Conference title on which this volume is based on}% event
+%{1}% volume
+%{1}% issue
+%{1}% starting page number
+%\EventShortName{}
+%\DOI{10.4230/LIPIcs.xxx.yyy.p}% to be completed by the volume editor
+%% Editor-only macros::end %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+
+% Author macros::begin %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{CLUE 2.0 - Constrained LUmping of differential Equations. }
+%\titlerunning{Approximate Constrained Lumping} %optional, in case that the title is too long; the running title should fit into the top page column
+
+
+\allowdisplaybreaks[0]
+
+\maketitle
+
+\begin{abstract}
+	\input{abst}
+\end{abstract}
+
+\keywords{Approximate reduction $\cdot$ Dynamical systems $\cdot$ Constrained lumping}
+
+
+\section{Introduction}\label{sec_intro}
+
+\input{intro}
+
+
+\section{Preliminaries}\label{sec_pre}
+
+\input{prelim}
+
+
+\section{Tool Description}\label{sec_desc}
+
+\input{description}
+
+
+
+\section{Evaluation}\label{sec_eval}
+
+\input{eval}
+
+
+
+\section{Conclusion}\label{sec_conc}
+
+\input{conc}
+
+
+\section*{Acknowledgment}
+The work was partially supported by the DFF project REDUCTO 9040-00224B, the Poul Due Jensen Grant 883901, the Villum Investigator Grant S4OS, the PRIN project SEDUCE 2017TWRCNB and the co-funding of European Union - Next Generation EU, in the context of The National Recovery and Resilience Plan, Investment 1.5 Ecosystems of Innovation, Project Tuscany Health Ecosystem (THE), CUP: B83C22003920001.
+
+
+\bibliographystyle{plain}
+\bibliography{cmsb}
+
+
+
+\appendix
+%
+\input{appendix}
+
+
+
+
+
+
+
+
+\end{document}
