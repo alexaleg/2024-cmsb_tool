@@ -1,77 +1,62 @@
 %!TEX root = 2024-cmsb_tool.tex
-%\comm{we need to cite some work by PC members (i.e., Tanja etc), maybe from our first CONCUR paper, QEST'18 Lumping the Approximate Master Equation for Multistate Processes on Complex Networks.}
+
 Dynamical models of biochemical systems help discover mechanistic principles in living organisms and predict their behavior under unseen circumstances.
 Realistic and accurate models, however, often require considerable detail that inevitably leads to large state spaces.
 This hinders both human intelligibility and numerical/computational analysis.
-For example, even the relatively primary mechanism of protein phosphorylation yields, in the worst case, a combinatorial state space as a function of the number of phosphorylation sites~\cite{FEBS:FEBS7027}.
+%For example, even the relatively primary mechanism of protein phosphorylation yields, in the worst case, a combinatorial state space as a function of the number of phosphorylation sites~\cite{FEBS:FEBS7027}.
 
-As a general way to cope with large state spaces, model reduction aims at providing a lower-dimensional representation of the system under study that retains some dynamical properties of interest to the modeler.
-In applications to systems biology, it is beneficial that the reduced state space keeps physical interpretability, mainly when the model is used to validate mechanistic hypotheses~\cite{10.1093/bioinformatics/btn035,21899762,Apri201216}.
-There is a variety of approaches in this context, such as those exploiting time-scale separation properties~\cite{okino1998,DBLP:journals/tac/WhitbyCKLTT22}, quasi-steady-state approximation~\cite{SegelS89,radulescu2012reduction}, heuristic fitness functions~\cite{10.1145/3071178.3071265}, spatial regularity~\cite{DBLP:journals/pe/TschaikowskiT17}, sensitivity analysis~\cite{Snowden:2017aa} and, at last, conservation analysis, which detects linear combinations of variables that are constant at all times~\cite{10.1093/bioinformatics/bti800}.
-
-By lumping, one generally refers to the latter class, with a self-consistent system of dynamical equations comprised of a set of macro-variables, each given in terms of combination of the original ones~\cite{okino1998,Snowden:2017aa,DBLP:conf/qest/GrossmannKBW18,backenkohler2021abstraction,DBLP:journals/pe/AbateACK21}.
-In linear lumping, this reduction is expressed as a linear transformation of the original state variables.
-Since this can destroy physical intelligibility in general, \emph{constrained lumping} allows restricting to only part of the state by defining linear combinations of state variables that ought to be preserved in the reduction~\cite{LI199195}.
-Lumping techniques of Markov chains date back to the early nineties~\cite{Larsen19911}.
-These were later extended to stochastic process algebra~\cite{10.1007/978-0-387-09680-3_18,10.1007/978-3-540-88479-8_13,10.1093/comjnl/bxr094,DBLP:conf/splc/Tribastone14,TSCHAIKOWSKI2014140}, and have been expanded more recently to efficient algorithmic approaches for stochastic chemical reaction networks~\cite{DBLP:journals/bioinformatics/CardelliPTTVW21} and deterministic models of biological systems~\cite{CARDELLI2019132,pnas17,DBLP:conf/lics/CardelliTTV16}.
-In these works, reduction mappings are linear mappings induced by a partition (i.e., an equivalence relation) of state variables; in the aggregated system each macro-variable represents the sum of the original variables of a partition block.
-
-In this paper we are concerned with systems of ordinary differential equations (ODEs) with analytical derivatives.
-\comalex{
-	As concrete instances, we mention systems with \textit{rational} and \textit{polynomial} derivatives which cover kinetic models with Hill~\cite{voit_biochemical_2013}, Michaelis-Menten~\cite{voit_biochemical_2013} and mass-action semantics (e.g.,~\cite{Voit:2013aa,DBLP:journals/biosystems/TrojakSPB23});
-	and that are also rich enough to model electric circuits~\cite{DBLP:journals/nc/CardelliTT20}.
-	%kinetic models developed via  and  which 
-	%These show up in practice as systems with \textit{polynomial} derivatives when the denominator is 1.
-	%these systems show up in two ways, \textit{polynomial} (e.g.,  when the denominator is 1\coma{do we really need this example?}) and  systems.
-	For polynomial systems, CLUE has been presented as an algorithm that efficiently computes constrained linear lumpings~\cite{ovchinnikov_clue_2021}.
-	While previous work required the symbolic computation of the eigenvalues of a nonconstant matrix~\cite{LiRabitz,LI199195}, CLUE avoids these computational shortcomings, thus enabling the analysis of models with several thousands of equations on standard hardware.
-}
-%CLUE avoids the computational shortcomings of previous work due to the symbolic computation of the eigenvalues of a nonconstant matrix~\cite{LiRabitz,LI199195}, thus enabling the analysis of models with several thousands of equations on standard hardware.
-In particular, CLUE can compute \emph{the smallest} linear dimensional reduction that preserves the dynamics of arbitrary linear combinations of original state variables given by the user.
-While it is possible to extend CLUE to rational systems~\cite{jimenez_clue_2022} by means of symbolic computations, this approach quickly becomes computationally expensive.
-This problem can be avoided by efficiently creating a representation of the dynamics by sampling it at different points using automatic differentiation~\cite{jimenez_clue_2022}.
-
-The aforementioned lumping approaches are \emph{exact}, in that the reduced model does not incur any approximation error (but only loss of information because, in general, the aggregation map is not invertible).
-Approximate lumping is a natural extension that has been studied for a long time (e.g.,~\cite{LI1990977}).
-Indeed, although exact reduction methods have been experimentally proved successful in a large variety of biological systems (e.g.,~\cite{SBML}), approximate reductions can be more robust to parametric uncertainty---which notoriously affects systems biology models (e.g.,~\cite{doi:10.1098/rsif.2017.0237,DBLP:conf/cmsb/BarnatBBDHPS17})---and offer a flexible trade-off between the aggressiveness of the reduction and its precision.
-For partition-based lumping algorithms, this has been recently explored.
-In~\cite{DBLP:conf/qest/CardelliTTV18}, the authors present an algorithm for approximate aggregation parameterized by a tolerance $\varepsilon$, which, informally, relaxes an underlying criterion of equality for two variables to be exactly lumped into the same block.
-Similarly, for linear lumpings, an approximate extension to CLUE for polynomial systems has been presented in~\cite{leguizamon-robayo_approximate_2023}.
-This approach relaxes the conditions for exact lumping using a \emph{lumping tolerance} parameter that is roughly related to how close a lumping matrix is to an exact lumping.
-In particular, the authors show that the actual error is proportional to the lumping tolerance.
-
-\comalex{
-	In this paper, we extend approximate constrained lumping~\cite{leguizamon-robayo_approximate_2023} to systems of ODEs with general analytical drifts including rational drifts, while still working in polynomial time.
-	Using a prototype implementation, we evaluate our approach on five polynomial models and four rational models representative of the literature.
-	We also propose a new way to compute an approximate lumping tolerance based on the expected size of the reduced model.
-	Overall, the numerical results recover previous ones~\cite{leguizamon-robayo_approximate_2023} and show that our extension can lead to substantially smaller reduced models while introducing limited errors in the dynamics both for polynomial and rational systems.
-	In light of these results, we propose a heuristic that provides one with a value to determine a lumping tolerance that outputs a reduction with an acceptable error.
-}
-\coma{Isn't this just a repetition of 'We also propose a new way to compute \ldots'??}
+%As a general way to cope with large state spaces, model reduction aims at providing a lower-dimensional representation of the system under study that retains some dynamical properties of interest to the modeler.
+%In applications to systems biology, it is beneficial that the reduced state space keeps physical interpretability, mainly when the model is used to validate mechanistic hypotheses~\cite{10.1093/bioinformatics/btn035,21899762,Apri201216}.
+%There is a variety of approaches in this context, such as those exploiting time-scale separation properties~\cite{okino1998,DBLP:journals/tac/WhitbyCKLTT22}, quasi-steady-state approximation~\cite{SegelS89,radulescu2012reduction}, heuristic fitness functions~\cite{10.1145/3071178.3071265}, spatial regularity~\cite{DBLP:journals/pe/TschaikowskiT17}, sensitivity analysis~\cite{Snowden:2017aa} and, at last, conservation analysis, which detects linear combinations of variables that are constant at all times~\cite{10.1093/bioinformatics/bti800}.
 
 
-\paragraph{\textbf{Further related work.}} We are complementary to classic works~\cite{LI1990977,LI199195} which do not address the efficient algorithmic computation of lumping. Moreover, we are more general than~\cite{iacobelli_lumpability_2013,tac15,DBLP:conf/qest/CardelliTTV18} which consider so-called ``proper'' lumping (i.e.,~\cite{Snowden:2017aa}) where each state variable appears in exactly one aggregated variable. %The algorithm takes as input a numerical tolerance and computes an approximate constrained lumping whose error is guaranteed to be proportional to the lumping tolerance. %The estimation rests upon Gronwall's inequality that has been used in~\cite{}.
-Likewise, we are complementary to rule-based reduction techniques~\cite{Feret21042009} which are independent of kinetic parameters~\cite{concur15}. As less closely related abstraction techniques, we mention (bisimulation) distance approaches for the approximate reduction of Markov chains~\cite{DBLP:conf/tacas/BacciBLM13,DBLP:conf/concur/DacaHKP16} and proper orthogonal projection~\cite{antoulas}, which, however, apply to linear systems. Abstraction of chemical reaction networks by means of learning~\cite{DBLP:journals/iandc/RepinP21,DBLP:conf/cmsb/CairoliCB21} and simulation~\cite{DBLP:conf/cmsb/HelfrichCKM22} are complementary to lumping methods.
+In this paper, we introduce a second version of CLUE that includes recent extensions to the core functionality. 
+These include the exact reduction of rational systems \cite{jimenez_clue_2022}, the 
+
+%By lumping, one generally refers to the latter class, with a self-consistent system of dynamical equations comprised of a set of macro-variables, each given in terms of combination of the original ones~\cite{okino1998,Snowden:2017aa,DBLP:conf/qest/GrossmannKBW18,backenkohler2021abstraction,DBLP:journals/pe/AbateACK21}.
+%In linear lumping, this reduction is expressed as a linear transformation of the original state variables.
+%Since this can destroy physical intelligibility in general, \emph{constrained lumping} allows restricting to only part of the state by defining linear combinations of state variables that ought to be preserved in the reduction~\cite{LI199195}.
+
+%Lumping techniques of Markov chains date back to the early nineties~\cite{Larsen19911}.
+%These were later extended to stochastic process algebra~\cite{10.1007/978-0-387-09680-3_18,10.1007/978-3-540-88479-8_13,10.1093/comjnl/bxr094,DBLP:conf/splc/Tribastone14,TSCHAIKOWSKI2014140}, and have been expanded more recently to efficient algorithmic approaches for stochastic chemical reaction networks~\cite{DBLP:journals/bioinformatics/CardelliPTTVW21} and deterministic models of biological systems~\cite{CARDELLI2019132,pnas17,DBLP:conf/lics/CardelliTTV16}.
+%In these works, reduction mappings are linear mappings induced by a partition (i.e., an equivalence relation) of state variables; in the aggregated system each macro-variable represents the sum of the original variables of a partition block.
+
+%In this paper we are concerned with systems of ordinary differential equations (ODEs) with analytical derivatives.
+%\comalex{
+	%As concrete instances, we mention systems with \textit{rational} and \textit{polynomial} derivatives which cover kinetic models with Hill~\cite{voit_biochemical_2013}, Michaelis-Menten~\cite{voit_biochemical_2013} and mass-action semantics (e.g.,~\cite{Voit:2013aa,DBLP:journals/biosystems/TrojakSPB23});
+	%and that are also rich enough to model electric circuits~\cite{DBLP:journals/nc/CardelliTT20}.
+	%%kinetic models developed via  and  which 
+	%%These show up in practice as systems with \textit{polynomial} derivatives when the denominator is 1.
+	%%these systems show up in two ways, \textit{polynomial} (e.g.,  when the denominator is 1\coma{do we really need this example?}) and  systems.
+	%For polynomial systems, CLUE has been presented as an algorithm that efficiently computes constrained linear lumpings~\cite{ovchinnikov_clue_2021}.
+	%While previous work required the symbolic computation of the eigenvalues of a nonconstant matrix~\cite{LiRabitz,LI199195}, CLUE avoids these computational shortcomings, thus enabling the analysis of models with several thousands of equations on standard hardware.
+%}
+%%CLUE avoids the computational shortcomings of previous work due to the symbolic computation of the eigenvalues of a nonconstant matrix~\cite{LiRabitz,LI199195}, thus enabling the analysis of models with several thousands of equations on standard hardware.
+%In particular, CLUE can compute \emph{the smallest} linear dimensional reduction that preserves the dynamics of arbitrary linear combinations of original state variables given by the user.
+%While it is possible to extend CLUE to rational systems~\cite{jimenez_clue_2022} by means of symbolic computations, this approach quickly becomes computationally expensive.
+%This problem can be avoided by efficiently creating a representation of the dynamics by sampling it at different points using automatic differentiation~\cite{jimenez_clue_2022}.
+
+%The aforementioned lumping approaches are \emph{exact}, in that the reduced model does not incur any approximation error (but only loss of information because, in general, the aggregation map is not invertible).
+%Approximate lumping is a natural extension that has been studied for a long time (e.g.,~\cite{LI1990977}).
+%Indeed, although exact reduction methods have been experimentally proved successful in a large variety of biological systems (e.g.,~\cite{SBML}), approximate reductions can be more robust to parametric uncertainty---which notoriously affects systems biology models (e.g.,~\cite{doi:10.1098/rsif.2017.0237,DBLP:conf/cmsb/BarnatBBDHPS17})---and offer a flexible trade-off between the aggressiveness of the reduction and its precision.
+%For partition-based lumping algorithms, this has been recently explored.
+%In~\cite{DBLP:conf/qest/CardelliTTV18}, the authors present an algorithm for approximate aggregation parameterized by a tolerance $\varepsilon$, which, informally, relaxes an underlying criterion of equality for two variables to be exactly lumped into the same block.
+%Similarly, for linear lumpings, an approximate extension to CLUE for polynomial systems has been presented in~\cite{leguizamon-robayo_approximate_2023}.
+%This approach relaxes the conditions for exact lumping using a \emph{lumping tolerance} parameter that is roughly related to how close a lumping matrix is to an exact lumping.
+%In particular, the authors show that the actual error is proportional to the lumping tolerance.
+
+%%\comalex{
+	%%In this paper, we extend approximate constrained lumping~\cite{leguizamon-robayo_approximate_2023} to systems of ODEs with general analytical drifts including rational drifts, while still working in polynomial time.
+	%%Using a prototype implementation, we evaluate our approach on five polynomial models and four rational models representative of the literature.
+	%%We also propose a new way to compute an approximate lumping tolerance based on the expected size of the reduced model.
+	%%Overall, the numerical results recover previous ones~\cite{leguizamon-robayo_approximate_2023} and show that our extension can lead to substantially smaller reduced models while introducing limited errors in the dynamics both for polynomial and rational systems.
+	%%In light of these results, we propose a heuristic that provides one with a value to determine a lumping tolerance that outputs a reduction with an acceptable error.
+%%}
+%%\coma{Isn't this just a repetition of 'We also propose a new way to compute \ldots'??}
 
 
-\paragraph{\textbf{Outline.}} Section~\ref{sec_pre} provides necessary preliminary notions, Section~\ref{sec_theory} introduces approximate constrained lumping, while Section~\ref{sec:computing} discusses how to compute it and how to choose the lumping tolerance value. Section~\ref{sec_eval} evaluates our proposal on models from the literature, while Section~\ref{sec_conc} concludes the paper.
-
-
-
-\paragraph{\textbf{Notation.}}
-\comalex{
-For a function $f$, we denote its domain by $\dom(f)$.
-The derivative with respect to time of a function $x : [0,T] \to \RE^m$ is denoted by $\dot{x}$.
-We denote a dynamical system by $\dot{x} = f(x)$, and denote its initial condition by $x(0)=x^{0}$.
-For $f: \mathbb{R}^{m} \to \mathbb{R}^{n}$,  we denote the Jacobian of $f$ at $x$ by $J(x)$.
-%For any vector $x \in \mathbb{R}^{m}$, we denote by $\mathbb{R}[x]$ and  $\mathbb{R}(x)$ the rings of polynomial functions and rational functions of $x$ with real coefficients respectively.
-Given a matrix $L \in \mathbb{R}^{m\times n} $, the rowspace of $L$ or the vector space generated by the rows of $L$ is denoted by $\rsp(L)$.
-We denote by $\bar{L} \in \mathbb{R}^{n \times m}$ a  pseudoinverse of $L$ (i.e. $L\bar{L}= I_{n}$ where $I_{n} \in \mathbb{R}^{n\times n}$ is the identity matrix).
-We reserve the term \textit{rational} for models with a non-trivial denominator on their right-hand side.
-}
-%The term \textit{pseudoinverse} refers to a right pseudoinverse.
-\coma{what do we mean? We already write explicitly 'a right pseudoinverse' in the previous sentence. Either we remove this sentence, or we remove right from the previous sentence}
-
+%%\paragraph{\textbf{Further related work.}} We are complementary to classic works~\cite{LI1990977,LI199195} which do not address the efficient algorithmic computation of lumping. Moreover, we are more general than~\cite{iacobelli_lumpability_2013,tac15,DBLP:conf/qest/CardelliTTV18} which consider so-called ``proper'' lumping (i.e.,~\cite{Snowden:2017aa}) where each state variable appears in exactly one aggregated variable. %The algorithm takes as input a numerical tolerance and computes an approximate constrained lumping whose error is guaranteed to be proportional to the lumping tolerance. %The estimation rests upon Gronwall's inequality that has been used in~\cite{}.
+%%Likewise, we are complementary to rule-based reduction techniques~\cite{Feret21042009} which are independent of kinetic parameters~\cite{concur15}. As less closely related abstraction techniques, we mention (bisimulation) distance approaches for the approximate reduction of Markov chains~\cite{DBLP:conf/tacas/BacciBLM13,DBLP:conf/concur/DacaHKP16} and proper orthogonal projection~\cite{antoulas}, which, however, apply to linear systems. Abstraction of chemical reaction networks by means of learning~\cite{DBLP:journals/iandc/RepinP21,DBLP:conf/cmsb/CairoliCB21} and simulation~\cite{DBLP:conf/cmsb/HelfrichCKM22} are complementary to lumping methods.
 
 
 
