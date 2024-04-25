@@ -1,17 +1,49 @@
 %!TEX root = 2024-cmsb_tool.tex
 
-Dynamical models of biochemical systems help discover mechanistic principles in living organisms and predict their behavior under unseen circumstances.
-Realistic and accurate models, however, often require considerable detail that inevitably leads to large state spaces.
-This hinders both human intelligibility and numerical/computational analysis.
+Dynamical models of biochemical systems help unravel mechanisms describing the behavior of living organisms and make predictions under unseen circumstances.
+Realistic models need to be built with enough detail to capture all the subtleties and factors involved in the description of the biological model of interest.
+This requires the use of large state spaces which are not amenable for human intelligibility or computational study.
+Model reduction is a set of techniques that provides the modeler with a lower-dimensional system, while preserving properties of interest of the original system.
+In the context of system biology, it is key to preserve physical interpretability as these models validate mechanistic insights~\cite{10.1093/bioinformatics/btn035,21899762,Apri201216}.
+
+%There is a plethora of reduction methods to carry out model reduction based on different approaches such as time-scale separation properties~\cite{okino1998,DBLP:journals/tac/WhitbyCKLTT22}, quasi-steady-state approximation~\cite{SegelS89,radulescu2012reduction}, heuristic fitness functions~\cite{10.1145/3071178.3071265}, spatial regularity~\cite{DBLP:journals/pe/TschaikowskiT17}, sensitivity analysis~\cite{Snowden:2017aa} and, at last, conservation analysis, which detects linear combinations of variables that are constant at all times~\cite{10.1093/bioinformatics/bti800}.
+
+Lumping is set of model reduction techniques that outputs a self-consistent system of dynamical equations comprised of a set of macro-variables, each given in terms of combination of the original ones~\cite{okino1998,Snowden:2017aa,DBLP:conf/qest/GrossmannKBW18,backenkohler2021abstraction,DBLP:journals/pe/AbateACK21}.
+In linear lumping, this reduction is expressed as a linear transformation of the original state variables.
+Since this can destroy physical intelligibility in general, \emph{constrained lumping} allows restricting to only part of the state by defining linear combinations of state variables that ought to be preserved in the reduction~\cite{LI199195}.
+
+
+CLUE has been presented as an algorithm that efficiently computes constrained linear lumpings~\cite{ovchinnikov_clue_2021}.
+It avoids the computational shortcomings of previous work due to the symbolic computation of the eigenvalues of a nonconstant matrix~\cite{LiRabitz,LI199195}, thus enabling the analysis of models with several thousands of equations on standard hardware.
+In particular, CLUE can compute \emph{the smallest} linear dimensional reduction that preserves the dynamics of arbitrary linear combinations of original state variables given by the user.
+While it is possible to extend CLUE to rational systems~\cite{jimenez_clue_2022} by means of symbolic computations, this approach quickly becomes computationally expensive.
+This problem can be avoided by efficiently creating a representation of the dynamics by sampling it at different points using automatic differentiation~\cite{jimenez_clue_2022}.
+
+
+In this paper, we introduce \ToolName adding new features to the existing package CLUE \cite{ovchinnikov_clue_2021,jimenez_clue_2022}.
+We extend this package to add functionality for approximate reductions.
+These are reductions that have more aggregating power at the expense of a bounded error\cite{leguizamon-robayo_approximate_2023}. 
+Moreover, we add functionality to get models from common repositories such as OdeBase\cite{}. 
+As well as simulation support for exploratory analysis.
+The tool can be installed via \texttt{pip} with the following command
+
+\texttt{pip install git+\RepoURL}
+
+
+
+
+%There is a variety of approaches in this context, such as those exploiting time-scale separation properties~\cite{okino1998,DBLP:journals/tac/WhitbyCKLTT22}, quasi-steady-state approximation~\cite{SegelS89,radulescu2012reduction}, heuristic fitness functions~\cite{10.1145/3071178.3071265}, spatial regularity~\cite{DBLP:journals/pe/TschaikowskiT17}, sensitivity analysis~\cite{Snowden:2017aa} and, at last, conservation analysis, which detects linear combinations of variables that are constant at all times~\cite{10.1093/bioinformatics/bti800}.
+%In applications to systems biology, it is beneficial that the reduced state space keeps physical interpretability, mainly when the model is used to validate mechanistic hypotheses.
+
+
+%Realistic and accurate models, however, often require considerable detail that inevitably leads to large state spaces.
+%This hinders both human intelligibility and numerical/computational analysis.
 %For example, even the relatively primary mechanism of protein phosphorylation yields, in the worst case, a combinatorial state space as a function of the number of phosphorylation sites~\cite{FEBS:FEBS7027}.
 
-%As a general way to cope with large state spaces, model reduction aims at providing a lower-dimensional representation of the system under study that retains some dynamical properties of interest to the modeler.
-%In applications to systems biology, it is beneficial that the reduced state space keeps physical interpretability, mainly when the model is used to validate mechanistic hypotheses~\cite{10.1093/bioinformatics/btn035,21899762,Apri201216}.
 %There is a variety of approaches in this context, such as those exploiting time-scale separation properties~\cite{okino1998,DBLP:journals/tac/WhitbyCKLTT22}, quasi-steady-state approximation~\cite{SegelS89,radulescu2012reduction}, heuristic fitness functions~\cite{10.1145/3071178.3071265}, spatial regularity~\cite{DBLP:journals/pe/TschaikowskiT17}, sensitivity analysis~\cite{Snowden:2017aa} and, at last, conservation analysis, which detects linear combinations of variables that are constant at all times~\cite{10.1093/bioinformatics/bti800}.
 
 
-In this paper, we introduce a second version of CLUE that includes recent extensions to the core functionality. 
-These include the exact reduction of rational systems \cite{jimenez_clue_2022}, the 
+%These include the exact reduction of rational systems \cite{jimenez_clue_2022}, the 
 
 %By lumping, one generally refers to the latter class, with a self-consistent system of dynamical equations comprised of a set of macro-variables, each given in terms of combination of the original ones~\cite{okino1998,Snowden:2017aa,DBLP:conf/qest/GrossmannKBW18,backenkohler2021abstraction,DBLP:journals/pe/AbateACK21}.
 %In linear lumping, this reduction is expressed as a linear transformation of the original state variables.

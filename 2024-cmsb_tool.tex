@@ -4,10 +4,12 @@
 \usepackage{amssymb,amsmath}
 \usepackage{algorithm,algorithmic}
 \usepackage[shortlabels]{enumitem}
+\usepackage[nocompress]{cite}
 %\usepackage{dsfont}
 %\usepackage[american]{babel}
 \usepackage{pgf}
-%\usepackage{tikz}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
 %\usepackage{wrapfig}
 %\usepackage{extarrows}
 %\usepackage{array}
@@ -15,6 +17,7 @@
 \usepackage{multicol}
 \usepackage{adjustbox}
 \usepackage{longtable}
+\usepackage{listings}
 %\usepackage{matlab-prettifier}
 %\usepackage{caption}
 % \captionsetup{compatibility=false}
@@ -23,6 +26,9 @@
 \usepackage{wrapfig}
 \usepackage{hyperref}
 %\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+\newcommand{\ToolName}{Tool Name~}
+\newcommand{\RepoURL}{URL~}
 
 \newif\ifshowcomments
 \showcommentstrue % uncomment to show the comments
@@ -140,7 +146,7 @@
 
 
 
-\title{CLUE 2.0 - Lumping of Ordinary Differential Equations}
+%\title{\ToolName - Lumping of Ordinary Differential Equations}
 
 \institute{
 	%University of Oxford, UK
@@ -157,8 +163,8 @@
 }
 
 \author{
-Alexander Leguizamon-Robayo \inst{1} \and
 Antonio Jim\'{e}nez-Pastor \inst{1} \and
+Alexander Leguizamon-Robayo \inst{1} \and
 Micro Tribastone\inst{2}
 Max Tschaikowski \inst{1} \and
 Andrea Vandin\inst{3,4}
@@ -191,7 +197,7 @@ Andrea Vandin\inst{3,4}
 %
 
 % Author macros::begin %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{CLUE 2.0 - Constrained LUmping of differential Equations. }
+\title{\ToolName:  Constrained LUmping of differential Equations. }
 %\titlerunning{Approximate Constrained Lumping} %optional, in case that the title is too long; the running title should fit into the top page column
 
 

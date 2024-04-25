@@ -1,0 +1,73 @@
+%\tikzstyle{startstop} = [rectangle, rounded corners, 
+%minimum width=2cm, 
+%minimum height=1cm,
+%text centered, 
+%draw=black, 
+%%fill=red!30
+%]
+
+\tikzstyle{io} = [trapezium, 
+trapezium stretches=true, % A later addition
+trapezium left angle=70, 
+trapezium right angle=110, 
+minimum width=2cm, 
+minimum height=1cm, text centered, 
+text width=2cm, 
+draw=black, fill=blue!30]
+
+\tikzstyle{startstop} = [rectangle, rounded corners, 
+minimum width=2cm, 
+minimum height=1cm, 
+text centered, 
+text width=2cm, 
+draw=black, 
+%fill=orange!30
+]
+
+\tikzstyle{decision} = [diamond, 
+minimum width=3cm, 
+minimum height=1cm, 
+text centered, 
+draw=black, 
+fill=green!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+\begin{figure}
+\begin{tikzpicture}[node distance=3cm]
+
+\node (dbs) [io] {OdeBase BiomodelsDB};
+\node (io) [startstop,below of=dbs,yshift=1cm] {Model I/O};
+\node (parse) [startstop, right of=io] {Parser};
+\node (local) [io, above of=parse,yshift=-1cm] {Local model};
+\node (clue) [startstop,right of=parse] {CLUE};
+\node (linalg) [startstop, below of=clue,yshift=1cm] {Linear Algebra};
+\node (sim) [startstop,right of= clue]{Simulation};
+
+%\node (pro2b) [process, right of=dec1, xshift=2cm] {Process 2b};
+%\node (out1) [io, below of=pro2a] {Output};
+%\node (stop) [startstop, below of=out1] {Stop};
+
+\draw [arrow] (dbs) -- (io);
+\draw [arrow] (io) -- (parse);
+\draw [arrow] (parse) -- node[anchor=north] {(2)} (clue);
+\draw [arrow] (local) -- node[anchor=east] {(1)} (parse);
+\draw [arrow] (linalg) -- (clue);
+\draw [arrow] (clue) -- (sim);
+%\draw [arrow] (dec1) -- node[anchor=east] {yes} (pro2a);
+%\draw [arrow] (dec1) -- node[anchor=south] {no} (pro2b);
+%\draw [arrow] (pro2b) |- (pro1);
+%\draw [arrow] (pro2a) -- (out1);
+%\draw [arrow] (out1) -- (stop);
+
+\end{tikzpicture}
+\caption{Architecture of \ToolName. 
+    The Model I/O module interfaces with model repositories such as OdeBase and BiomodelsDB. 
+    The Parsing module can take a model from the mentioned databases or a local model. 
+    Local models (1) can be parsed \texttt{.ode} files. 
+    They can also be directly input to the CLUE module via \texttt{sympy}. 
+    All models are then parsed (2) into instances of the class \texttt{FODESystem} that supports reductions and simulations. 
+    To carry out these simulations the CLUE module uses the Linear Algebra module.
+}
+\label{fig:clue_arch}
+\end{figure}

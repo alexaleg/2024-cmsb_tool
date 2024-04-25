@@ -1,5 +1,107 @@
 %!TEX root = 2024-cmsb_tool.tex
-Introduce what lumping is in the case of a rational system. 
+%Introduce what lumping is in the case of a rational system. 
+Constrained lumping is a reduction method that allows to reduce a system in a way that it preserves a linear combination of variables of interest. 
+Suppose we are interested in the evolution of an observable $x_1$ and its evolution is described by the following system of ODEs  
+    \begin{equation} \label{eq:example1}
+        \dot{x_{1}} = \frac {x_{2}^{2} +4x_{2}x_{3} +4x_{3}^{2}}{x_{1}^{2} + 1 },\qquad
+        \dot{x_{2}} = \frac{2x_{1}-4x_{3}}{x_{2}+2x_{3} + 1},\qquad
+        \dot{x_{3}} = \frac{-x_{1}-x_{2}}{x_{2}+2x_{3}+1}.
+    \end{equation}
+    The matrix $L = (1 \ 0\ 0, 0\ 1\  2)^{T}$ is an \textit{exact constrained lumping} of dimension 2, since it allows one to construct a smaller self-consistent system in terms of the \textit{macro-variables} $y_1= x_1$ and $ y_2 = x_2 + 2x_3$, as follows:
+\begin{equation*}
+        \begin{pmatrix}
+            \dot{y}_{1} \\
+            \dot{y}_{2}
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \dot{x}_{1} \\
+            \dot{x}_{2} +2 \dot{x}_{3}
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \frac{(x_{2}+2x_{3})^{2}}{x_{1}^{2}+1} \\
+            \frac{-2x_{2}-4x_{3}}{x_{2}+2x_{3}}
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \frac{y_{2}^{2}}{y_{1}^{2}+1} \\
+            \frac{-2y_{2}}{y_{2}+1}
+        \end{pmatrix}.
+\end{equation*}
+The matrix $L$ is a \textit{constrained} lumping since the evolution of $x_1$ can be directly recovered from the evolution of $y_1$.
+It is \textit{exact} as there the evolution of $x_1$ can be recovered without any errors by using the lower dimensional system.
+In general, given a system of ODEs $\dot{x} = f(x)$  and an exact lumping $L$ a self-consistent reduced system can be constructed as 
+$y= L f(\bar{L}x)$, where $y = Lx$ and $\bar{L}$ is a right-pseudo inverse of $L$.
+
+Now, suppose the evolution of $x_1$ is described by a slightly different system:
+\begin{equation} \label{eq:examplepert}
+	\dot{x}_{1} = \frac {x_{2}^{2} +4.05x_{2}x_{3} +4x_{3}^{2}}{x_{1}^{2} + 1 },~
+	\dot{x}_{2} = \frac{2x_{1}-4x_{3}}{x_{2}+2x_{3} + 1},~
+	\dot{x}_{3} = \frac{-x_{1}-x_{2}}{x_{2}+2x_{3}+1}.
+\end{equation}
+In this case, it is not possible to construct an exact approximate constrained lumping.
+However, by relaxing the conditions for lumping the matrix $L = (1 \ 0\ 0, 0\ 1\  2)^{T}$ we can compute a smaller system that preserves $x_1$ up to an error, as follows.
+\begin{equation*}
+		\begin{pmatrix}
+			\dot{y}_{1} \\
+			\dot{y}_{2}
+		\end{pmatrix}
+		= L f \left(  \bar{L}        \begin{pmatrix}
+			y_{1} \\
+			y_{2}
+		\end{pmatrix}
+		\right)
+		=
+		L f \left(
+		\begin{pmatrix}
+				y_{1} & 0        \\
+				0     & 0.2y_{2} \\
+				0     & 0.4y_{2}
+			\end{pmatrix} \right)
+		=
+		%L \begin{pmatrix}
+		%1.004y_{2}^{2}    \\
+		%2y_{1} - 1.6y_{2} \\
+		%-y_{1}-0.2y_{2}
+		%\end{pmatrix}=
+		\begin{pmatrix}
+			\frac{1.004y_{2}^{2}}{y_{1}^{2}+1} \\
+			\frac{-2y_{2}}{y_{2}+1}
+		\end{pmatrix}.
+	\end{equation*}
+\begin{wrapfigure}[12]{r}{0.4\textwidth}
+		\centering
+        \vspace{-0.5cm}
+		\includegraphics[width=0.7\linewidth]{./img/sim_red_example.png}
+		\caption{Evolution of the reduced (orange) and original (blue).}
+		\label{fig:apperr:sim}
+\end{wrapfigure}
+This means that the evolution of $x_1$ will be recovered up to an error.
+Figure~\ref{fig:apperr:sim} shows the evolution of $x_1$ computed via the original and reduced system for initial conditions $x = (1,0,0)^{T}$
+Note that by using an approximate reduction it is possible to reduce a system that was not exactly reducible while still obtaining a simulation with low error.
+The detailed theory or approximate constrained lumping for polynomial systems, including the algorithm to compute them and how to bound the introduce errors, can be found in~\cite{leguizamon-robayo_approximate_2023}.
+
+
+
+%In general, for an ODE system $\dot{x}= f(x)$  
+%Consider a system of ODEs $\dot{x}= f(x)$, where $f: \mathbb{R}^{n}\to \mathbb{R}^{n}$ and each entry of $f$ is a rational function. 
+%We say that a linear transformation $L: \mathbb{R}^{n}\to \mathbb{R}^{m}$ with $m< n$ is an \textit{exact lumping} if there exists a function $g:\mathbb{R}^{m} \to \mathbb{R}^{m}$, such that $L\circ f = g \circ L$. 
+%For an initial condition $x(0) \in \mathbb{R}^n$ and an exact lumping $L$, there is a corresponding initial condition $y(0)$ in the lumped variables given by $y(0) = L x(0)$.
+%A self-consistent system of ODEs can be constructed as follows \[L\dot{x} = Lf(x)= g(Lx)=g(y)=\dot{y}\ .\]
+
+
+
+%Assume now that the dynamics are given by 
+%\begin{equation} \label{eq:examplepert}
+	%\dot{x}_{1} = \frac {x_{2}^{2} +4.05x_{2}x_{3} +4x_{3}^{2}}{x_{1}^{2} + 1 },~
+	%\dot{x}_{2} = \frac{2x_{1}-4x_{3}}{x_{2}+2x_{3} + 1},~
+	%\dot{x}_{3} = \frac{-x_{1}-x_{2}}{x_{2}+2x_{3}+1}.
+%\end{equation}
+%We still want to preserve the observable $x_1$. 
+%In this case, the matrix $L = (1 \ 0\ 0, 0\ 1\  2)^{T}$ is not 
+
+
 
 %In this paper, we study systems of ODEs with analytic derivatives of the form:
 %\begin{equation}
@@ -12,54 +114,6 @@ Introduce what lumping is in the case of a rational system.
 	%we say that $L$ is an \emph{exact lumping of dimension $l$} (or that the system is \emph{exactly lumpable} by $L$) if there exists a function $g: \mathbb{R}^{l} \to \mathbb{R}^{l}$ with polynomial entries such that $Lf = g\circ L$.
 %\end{definition}
 
-
-%\begin{myExample} \label{ex:firstode}
-	%Consider the following system
-	%%Example that shows there is no need for the numerators to be lumpable
-	%%\dot{x_{1}} = \frac {x_{2}^{2} +4x_{2}x_{3} +4x_{3}^{2}}{x_{1}^{2} - x_{2} -2x_{3}},\qquad
-	%%\dot{x_{2}} = \frac{-x_{1}+x_{2}+2x_{3}}{2x_{1}+x_{2}+2x_{3}},\qquad
-	%%\dot{x_{3}} = -x_{1}.
-	%\begin{equation} \label{eq:example1}
-		%\dot{x_{1}} = \frac {x_{2}^{2} +4x_{2}x_{3} +4x_{3}^{2}}{x_{1}^{2} + 1 },\qquad
-		%\dot{x_{2}} = \frac{2x_{1}-4x_{3}}{x_{2}+2x_{3} + 1},\qquad
-		%\dot{x_{3}} = \frac{-x_{1}-x_{2}}{x_{2}+2x_{3}+1}.
-	%\end{equation}
-	%Then, the matrix $L = (1 \ 0\ 0, 0\ 1\  2)^{T}$
-	%is an exact lumping of dimension 2, since
-	%\begin{equation*}
-		%\begin{pmatrix}
-			%\dot{y}_{1} \\
-			%\dot{y}_{2}
-		%\end{pmatrix}
-		%=
-		%\begin{pmatrix}
-			%\dot{x}_{1} \\
-			%\dot{x}_{2} +2 \dot{x}_{3}
-		%\end{pmatrix}
-		%=
-		%\begin{pmatrix}
-			%\frac{(x_{2}+2x_{3})^{2}}{x_{1}^{2}+1} \\
-			%\frac{-2x_{2}-4x_{3}}{x_{2}+2x_{3}}
-			%%\frac{-4x_{1}^{2} -2x_{1}(x_{2}+2x_{3})-x_{1} +(x_{2}+2x_{3})}{2x_{1}+x_{2}+2x_{3}}
-			%%-4*x1^2 - 2*x1*x2 - 4*x1*x3 - x1 + x2 + 2*x3
-		%\end{pmatrix}
-		%%\begin{pmatrix}
-		%%\dot{y}_{1} \\
-		%%\dot{y}_{2}
-		%%\end{pmatrix}
-		%=
-		%\begin{pmatrix}
-			%\frac{y_{2}^{2}}{y_{1}^{2}+1} \\
-			%\frac{-2y_{2}}{y_{2}+1}
-			%%\frac{-4y^{1}_{1} -2y_{1}y_{2}-y_{1}+y_{2}}{2y_{1}+y_{2}}
-		%\end{pmatrix}
-		%=
-		%\begin{pmatrix}
-			%g_{1}(y_{1},y_{2}) \\
-			%g_{2}(y_{1},y_{2})
-		%\end{pmatrix}.
-	%\end{equation*}
-%\end{myExample}
 
 %\begin{definition}\label{def:constlump}
 	%Given a system of ODEs of the form given by Equation~\eqref{eq:ode}, and an exact lumping $L\in \mathbb{R}^{l\times m}$, we say that $y= Lx$ are the \emph{reduced (or lumped) variables}, 	and their evolution is given by the \emph{reduced system} $ \dot{y}= g(y)$.
