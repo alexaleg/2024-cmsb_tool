@@ -1,47 +1,66 @@
 %!TEX root = 2024-cmsb_tool.tex
 \ToolName is an open source python library.
-It uses \texttt{Scipy, Numpy} for numerical calculations, while \texttt{sympy} for exact symbolic ones.
-The architecture of \ToolName is shown in Figure~\ref{fig:clue_arch}.
-The functionalities can be grouped in three sets: the model input, the core modules and the output modules.
+CLUE is designed as a library to be used for model analysis and exploration.
+The architecture of CLUE has been planned for efficient interaction and data handling through three main components:
+model input, core functionalities, and outputs. 
+The model input component handles the steps of model acquisition and processing.
+The core functionalities component contains all the logic to apply model reduction onto the models.
+The outputs component formats simulations and allows for preliminary data analysis. 
+Figure~\ref{fig:clue_arch} shows the architecture of \ToolName with the internal modules, classes, methods with their interactions.
 %Explain the software architecture of the project 
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{img/clue.pdf}
-	\caption{Architecture of \ToolName.}
+	\caption{Architecture of \ToolName(red).
+        The arrows indicate data flow.
+        The components of CLUE (blue) are composed of important modules (green).
+        Important classes and methods are also displayed (orange) highlighting the \texttt{lumping} method.
+        External files and sources are displayed in purple.
+     }
 	\label{fig:clue_arch}
 \end{figure}
-%Classes, main methods and functionalities
-%Add explicit simulation 
-% Approximate reductions of rational dynamical systems in CLUE
+We now continue with a detailed description of each of the components.
+
 \subsection{Model Input}
-\ToolName supports local models either written using \texttt{sympy}, as ERODE \texttt{.ode} files or they can be pulled directly from the OdeBase repository.
-Systems of ODEs written in \texttt{sympy} can be directly instantiated as CLUE objects.
-Models from the ODEBase repository are directly converted into CLUE objects using the functionality of the \texttt{odebase\_io.py} module.
-Finally \texttt{.ode} are translated to CLUE objects via \texttt{ode\_parser.py}.
-Additional utilities used when parsing rational systems are stored in \texttt{rational\_function.py}.
+CLUE supports models from three different sources ODEBase, python scripts and ERODE \texttt{.ode} files. 
+The interface to ODEBase is in \texttt{odebase\_io.py}. 
+This allows the modeler to fetch models from ODEBase and automatically convert them to instances of the \texttt{FODEsystem} class.
+Similarly, it is possible to load a \texttt{.ode} file and convert it to an instance of \texttt{FODEsystem}. 
+This functionality is stored in the \texttt{ode\_parser.py} module. 
+Finally, CLUE can directly parse systems of differential equations written in \texttt{sympy}. 
+All these functionalities are supported by the \texttt{rational\_function.py} module, which provides tools for efficient parsing and representation of polynomial and rational systems.
+
+%\ToolName supports local models either written using \texttt{sympy}, as ERODE \texttt{.ode} files or they can be pulled directly from the OdeBase repository.
+%Systems of ODEs written in \texttt{sympy} can be directly instantiated as CLUE objects.
+%Models from the ODEBase repository are directly converted into CLUE objects using the functionality of the \texttt{odebase\_io.py} module.
+%Finally \texttt{.ode} are translated to CLUE objects via \texttt{ode\_parser.py}.
+%Additional utilities used when parsing rational systems are stored in \texttt{rational\_function.py}.
 
 \subsection{Core functionalities}
-The core functionalities of \ToolName are stored in the modules \texttt{linalg.py} and \texttt{clue.py}
+The core functionalities of \ToolName are stored in the module \texttt{clue.py}.
+In this module, the main object is the \texttt{FODEsystem} which contains all necessary information to a simulate a model such as the equations, parameters and initial conditions. 
+A simulation can be computed via the \texttt{simulate} method.
+Additionally, \texttt{FODESystem} offers export functionality to \texttt{.ode} files as well as serialized \texttt{.clue} files.
+Similarly, it stores observables and representation of the dynamics necessary to compute lumpings. 
+The key methods are the \texttt{lumping} and \texttt{app\_lumping} which compute exact and numerical lumpings,  respectively. 
+The outputs of these methods are instances of \texttt{LDESystem}. 
+This is a children class of \texttt{FODEsystem} that extends the existing functionalities \texttt{FODESystem}  to account for the existing lumping. 
+An example of this is storing mappings from the original to the lumped variables.
 
-\subsubsection{Linear Algebra}
-All linear algebraic operations are done using \texttt{SparseVectors} which are hash tables storing as keys the number of the nonzero value and as values the actual values of the vector.
+Given an observable, a constrained lumping is computed by finding the smallest invariant subspace from which the evolution of the observable can be recovered. 
+In accordance to the mentioned theory, we implement exact lumpings as instances of the \texttt{Subspace} class, while approximate lumpings as instances of the \texttt{NumericalSubspace} class.
+These classes and all linear algebraic computations are stored in the module \texttt{linalg.py}.
+Given an exact lumping $L$, an instance of \texttt{Subspace} computes the space generated by the rows of $L$ via Gaussian elimination, while \texttt{NumericalSubspace} does it by using orthogonal projections.
+It should be noted that all exact computations are carried out using the rational number field provided by \texttt{sympy}.
+For both numerical and exact computations we use our own implementation for matrix operations.
+Matrices are stored as hash tables where the keys are the nonzero rows and the values are \texttt{SparseVectors} representing the actual row.
+Instance of \texttt{SparseVector}  are hash tables storing as keys the number of the nonzero value and as values the actual values of the vector.
 For example the vector $(0,0,0,1,0,0,2,0,5,0)$ is stored as the hash table $\{ 3:1, 6:2, 9:5\}$.
-Similarly, matrices are stored as hash tables where the keys are the nonzero rows and the values are \texttt{SpareseVectors} representing the actual row.
-All lumpings are computing by finding an invariant subspace.
-These can be \texttt{Subspace} or \texttt{NumericalSubspace} for exact and approximate lumpings, respectively.
-Given an exact lumping $L$, \texttt{Subspace} computes the space generated by the rows of $L$ via Gaussian elimination, while \texttt{NumericalSubspace} does it by using orthogonal projections.
 
-\subsubsection{Constrained Lumping}
-The main module of \ToolName is \texttt{clue.py}.
-In this module, the main object is the \texttt{FODEsystem} which contains all the information related to a model.
-This means the dynamics, parameters, observables and initial conditions.
-It includes functionality to compute both exact and approximate lumpings for systems of Polynomial and Rational ODEs.
-As well as to export systems as \texttt{.ode} files.
-The class \texttt{LDESystem} extends the \texttt{FODEsystem} class to store lumpings.
-It stores the lumping as a \texttt{Subspace} and has extra functionality such as storing the old system for ease of use.
-
-\subsection{Simulation and output}
-The last set of functionalities is in the \texttt{simulations.py} module.
-This is a simple interface to \texttt{scipy} and \texttt{matplotlib} made to quickly run and plot simulations.
-It allows the simple data manipulation and output of plots and formatted tables for simulation results.
+\subsection{Outputs}
+Utilities to handle simulations are stored in the \texttt{simulations.py} module. 
+Basic manipulation of simulation data is supported.
+This corresponds to merging, comparing and applying matrices to  simulation results.
+Similarly, basic plot functionality is supported as well as exporting plots and/or simulation data.
+ 
 
