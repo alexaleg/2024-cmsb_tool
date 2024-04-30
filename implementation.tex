@@ -5,7 +5,8 @@ The architecture of CLUE has been planned for efficient interaction and data han
 The model input component handles the steps of model acquisition and processing.
 The core functionalities component, instead, contains all the logic to apply model reduction onto the models.
 The outputs component formats simulations and allows for preliminary data analysis. 
-Figure~\ref{fig:clue_arch} shows the architecture of \ToolName with the internal modules, classes, methods with their interactions.
+The architecture of CLUE is summarized in Figure~\ref{fig:clue_arch}.
+We now proceed to explain each component in detail.
 %Explain the software architecture of the project 
 \begin{figure}
 	\centering
@@ -17,15 +18,14 @@ Figure~\ref{fig:clue_arch} shows the architecture of \ToolName with the internal
      }
 	\label{fig:clue_arch}
 \end{figure}
-We now provide a detailed description of each component.
+%We now provide a detailed description of each component.
 
 \subsection{Model Input}
-The main goal of this component is to construct instances of  the \texttt{FODEsystem} class from the supported sources: ODEBase,  ERODE~\cite{cardelli_erode_2017} \texttt{.ode}, and \texttt{sympy} systems of ODEs.
+The main goal of this component is to construct instances of the \texttt{FODEsystem} class from the supported sources: ODEBase~\cite{LuedersSturmRadulescu22},  ERODE~\cite{cardelli_erode_2017} \texttt{.ode} files, and systems of ODEs using \texttt{sympy}.
 The module \texttt{odebase\_io.py} allows the modeler to fetch models from ODEBase~\cite{LuedersSturmRadulescu22} as instances of \texttt{FODESystem}.
-Similarly, the \texttt{ode\_parser.py} module parses and casts \texttt{.ode}  to instances of \texttt{FODEsystem}. 
-Finally, CLUE can directly parse systems of differential equations written in \texttt{sympy}. 
-TODO
-All these functionalities are supported by the \texttt{rational\_function.py} module, which provides tools for efficient parsing and representation of polynomial and rational systems.
+Similarly, the \texttt{ode\_parser.py} module parses \texttt{.ode} files to instances of \texttt{FODEsystem}. 
+Alternatively, CLUE can directly parse systems of differential equations written in \texttt{sympy}. 
+Regardless of the model source, the creation of instances of \texttt{FODESystem} relies on efficient representation of polynomials and rational functions which are stored in the \texttt{rational\_function.py} module.
 
 %\ToolName supports local models either written using \texttt{sympy}, as ERODE \texttt{.ode} files or they can be pulled directly from the OdeBase repository.
 %Systems of ODEs written in \texttt{sympy} can be directly instantiated as CLUE objects.
@@ -34,32 +34,31 @@ All these functionalities are supported by the \texttt{rational\_function.py} mo
 %Additional utilities used when parsing rational systems are stored in \texttt{rational\_function.py}.
 
 \subsection{Core functionalities}
-The core functionalities of \ToolName are stored in the module \texttt{clue.py}.
-In this module, the main object is the \texttt{FODEsystem} which contains all necessary information to a simulate a model such as the equations, parameters and initial conditions. 
-A simulation can be computed via the \texttt{simulate} method.
-Additionally, \texttt{FODESystem} offers export functionality to \texttt{.ode} files as well as serialized \texttt{.clue} files.
-Similarly, it stores observables and representation of the dynamics necessary to compute lumpings. 
-The key methods are the \texttt{lumping} and \texttt{app\_lumping} which compute exact and numerical lumpings,  respectively. 
-The outputs of these methods are instances of \texttt{LDESystem}. 
-This is a children class of \texttt{FODEsystem} that extends the existing functionalities \texttt{FODESystem}  to account for the existing lumping. 
-An example of this is storing mappings from the original to the lumped variables.
+The core functionalities of \ToolName are available in the module \texttt{clue.py}.
+In this module, the main class is \texttt{FODEsystem} which contains all necessary information to simulate a model e.g., equations, observables, parameters and initial conditions. 
+Simulations can be computed via the \texttt{simulate} method.
+Additionally, \texttt{FODESystem} offers export functionality to \texttt{.ode} files and to serialized \texttt{.clue} files.
+Similarly, it stores the necessary observables and representations of the dynamics to compute lumpings. 
 
 Given an observable, a constrained lumping is computed by finding the smallest invariant subspace from which the evolution of the observable can be recovered. 
-In accordance to the mentioned theory, we implement exact lumpings as instances of the \texttt{Subspace} class, while approximate lumpings as instances of the \texttt{NumericalSubspace} class.
+Following the  theory presented in~\cite{leguizamon-robayo_approximate_2023, jimenez_clue_2022}, lumpings are computed using the \texttt{lumping} and \texttt{app\_lumping} methods which find exact and approximate lumpings, respectively. 
+The outputs of these methods are instances of \texttt{LDESystem}. 
+This class inherits from \texttt{FODEsystem}, while including lumping information e.g, the lumping subspace and mappings from the original to the lumped variables.
+
+Exact lumping subspaces are instances of the \texttt{Subspace} class, which stores them as matrices in row-echelon form.
+In contrast, approximate lumping subspaces are instances of the \texttt{NumericalSubspace} class, which stores them as orthonormal matrices.
 These classes and all linear algebraic computations are stored in the module \texttt{linalg.py}.
-Given an exact lumping $L$, an instance of \texttt{Subspace} computes the space generated by the rows of $L$ via Gaussian elimination, while \texttt{NumericalSubspace} does it by using orthogonal projections.
+%Given an exact lumping $L$, an instance of \texttt{Subspace} stores the space generated by the rows of $L$ in row echelon form, while \texttt{NumericalSubspace} does it using an orthonormal representation.
 It should be noted that all exact computations are carried out using the rational number field provided by \texttt{sympy}.
-For both numerical and exact computations we use our own implementation for matrix operations.
+For both numerical and exact computations, we use our own implementation of matrix arithmetic.
 Matrices are stored as hash tables where the keys are the nonzero rows and the values are \texttt{SparseVectors} representing the actual row.
-Instance of \texttt{SparseVector}  are hash tables storing as keys the number of the nonzero value and as values the actual values of the vector.
+Instances of \texttt{SparseVector}  are hash tables storing  the number of the nonzero value as keys and  the actual values of the vector as values.
 For example the vector $(0,0,0,1,0,0,2,0,5,0)$ is stored as the hash table $\{ 3:1, 6:2, 9:5\}$.
 
 \subsection{Outputs}
-Utilities to handle simulations are stored in the \texttt{simulations.py} module. 
-Basic manipulation of simulation data is supported.
+Utilities to handle simulations are provided in the \texttt{simulations.py} module. 
+Basic manipulation of simulations and data is supported.
 This corresponds to merging, comparing and applying matrices to  simulation results.
-Similarly, basic plot functionality is supported as well as exporting plots and/or simulation data.
+Similarly, basic plot functionality is supported, namely, exporting plots and/or simulation data.
  
-Elaborate the explanation for import functionalities 
-Illustration of CLUE
 

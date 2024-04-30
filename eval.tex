@@ -1,7 +1,7 @@
 %!TEX root = 2024-cmsb_tool.tex
 % Take a model from OdeBase or BioModels.
-In this section, we show an example workflow using CLUE.
-The example described in this section is also available as a Jupyter notebook in \RepoURL.
+In this section, we show an example workflow dusplaying the main features of CLUE on a model from the literature.
+A full listing of this section is available in the appendix and as a Jupyter notebook in \RepoURL.
 Suppose we want to study the signaling mechanism in apoptosis as described by kinetic model in~\cite{legewie_mathematical_2006}.
 
 \textbf{Step 1. Model Retrieval.}
@@ -11,7 +11,7 @@ To access the required model from ODEBase, we use the following line
 \end{minted}
 
 \textbf{Step 2. Model Validation.}
-Having retrieved the model, we can examine various attributes such as name, size, species, parameters, and equations:
+Having retrieved the model, we can examine various attributes:
 \begin{minted}{python}
     >>> print(model.name)  # Outputs the name of the model
     >>> print(model.size)  # Outputs the size of the model
@@ -19,32 +19,32 @@ Having retrieved the model, we can examine various attributes such as name, size
     >>> print(model.parameters)  # Displays the model parameters 
     >>> print(model.equations)  # Shows the model equations
 \end{minted}
-We get that the original model size is 13.
+In particular, we get that the original model size is 13.
 
 \textbf{Step 3. Analyses and lumping.}
 Following the original paper~\cite{legewie_mathematical_2006}, we are interested in studying the evolution of the observable $C_3$, which is represented as the variable $x7$ in the model.
-We first use exact lumping.
-To get an exact lumping that preserves $x7$, we use the following line:
+As a first step we compute an exact lumping that preserves $x7$.
 \begin{minted}{python}
    >>> exact_lump = model.lumping(['x7'])
 \end{minted}
-We get a lumped system with a warning that informs us that the size of the lumped system is 13.
-TODO:show warning
+This command raises a warning that informs us that the size of the lumped system is 13.
+\begin{minted}{bash}
+    [lumping] Warning: lumped size (13) and original size (13) are the same.
+\end{minted}
 This means that it was impossible to find an exact reduction.
 
-We can use the approximate lumping functionality of CLUE to increase the aggregation power. 
-To this aim, we use the following command 
+We can use the approximate lumping functionality of CLUE to increase the aggregation power with the following command 
 \begin{minted}{python}
     >>> app_lump_1 = model.app_lumping(['x7'])
 \end{minted}
-This command relaxes the conditions of exact lumping until it finds a reduction that is smaller than the exact one. 
+This command relaxes the conditions of exact lumping until it finds a reduction that is smaller than the exact one.
 In this case, the resulting reduction is of size $12$. 
 
-In case we would like to find more significant reductions, it is possible to add a size limit to the approximate lumping with the following command.
+To find more significant reductions, it is possible to add a size limit. 
 \begin{minted}{python}
     >>> app_lump_2 = model.app_lumping(['x7'], max_size=10)
 \end{minted}
-In this case, the output will be the largest reduction possible having at most 10 lumped species.
+The output will be the largest reduction possible having at most 10 lumped species, following the approach of~\cite{leguizamon-robayo_approximate_2023}.
 The resulting lumped model in this case is of size 7.
 
 \textbf{Step 4. Simulating and comparing models.}
@@ -60,21 +60,19 @@ We now merge all simulations into one.
    >>> merged = merge_simulations(merged_aux, app_sim_2) 
 \end{minted}
 \textbf{Step 5. Visualizing the results.}
-To visualize the results of all three reductions, we use the following line.
+To visualize the merged results (Fig.~\ref{fig:results}), we use the following line.
 \begin{minted}{python}
    >>> create_figure(comp_results, title=['Exact', 'App_12', 'App_7']) 
 \end{minted}
-The resulting figure is 
-\begin{figure}
+
+\begin{wrapfigure}[12]{r}{0.4\textwidth}
     \centering
-    \includegraphics[width=0.3\textwidth]{img/examplecalc.pdf}
+    \vspace{-2cm}
+    \includegraphics[width=0.35\textwidth]{img/examplecalc.pdf}
     \caption{\comalex{this is a placeholder}
         Time evolution of the $C_3$ concentration using approximate constrained lumping.}
-\end{figure}
-
-Add complete code to appendix
-Say that we highlight the main commands and the full code listing is in the appendix
-Following the approach of the previous cmsb for max\_size
+    \label{fig:results}
+\end{wrapfigure}
 
 
 %We begin by getting a model from OdeBase:\\
